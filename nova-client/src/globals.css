@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+/* ==================================================================
+   NOVA DESIGN TOKENS
+   An AI life companion. Calm, premium, alive — never a dashboard.
+
+   Palette
+   -------
+   Aurora Violet   #7C6CF6  — primary, the color of "Nova thinking"
+   Dawn Coral      #FF8B6B  — secondary, warmth / human moments
+   Sage            #6FCF97  — success / growth
+   Amber           #F5A623  — warning / attention
+   Rose            #EF5D6F  — error / care needed
+   Cloud (light bg)#F3F4F7  — cool off-white, not cream
+   Ink (dark bg)   #0B0C10  — near-black with a blue undertone
+   ================================================================== */
+
+@layer base {
+  :root {
+    --background: 243 244 247;      /* Cloud */
+    --surface: 255 255 255;
+    --card: 255 255 255;
+    --card-elevated: 255 255 255;
+    --border: 224 225 231;
+    --border-strong: 205 207 216;
+
+    --text: 17 19 24;
+    --text-secondary: 71 75 88;
+    --muted: 138 142 155;
+
+    --primary: 124 108 246;         /* Aurora Violet */
+    --primary-foreground: 255 255 255;
+    --secondary: 255 139 107;       /* Dawn Coral */
+    --secondary-foreground: 255 255 255;
+
+    --success: 111 207 151;
+    --warning: 245 166 35;
+    --error: 239 93 111;
+
+    --ring: 124 108 246;
+
+    --gradient-aurora: linear-gradient(135deg, #7C6CF6 0%, #B8A6FF 45%, #FF8B6B 100%);
+    --gradient-mesh: radial-gradient(60% 60% at 15% 10%, rgba(124,108,246,0.16) 0%, rgba(124,108,246,0) 60%),
+                      radial-gradient(50% 50% at 90% 20%, rgba(255,139,107,0.14) 0%, rgba(255,139,107,0) 60%);
+
+    --shadow-soft: 0 1px 2px rgba(17,19,24,0.04), 0 8px 24px rgba(17,19,24,0.06);
+    --shadow-float: 0 12px 40px rgba(17,19,24,0.10), 0 2px 8px rgba(17,19,24,0.05);
+    --shadow-glow: 0 0 0 1px rgba(124,108,246,0.08), 0 12px 32px rgba(124,108,246,0.18);
+
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+    --radius-pill: 999px;
+  }
+
+  .dark {
+    --background: 11 12 16;         /* Ink */
+    --surface: 18 19 25;
+    --card: 22 23 30;
+    --card-elevated: 27 28 37;
+    --border: 38 40 51;
+    --border-strong: 54 56 70;
+
+    --text: 240 240 244;
+    --text-secondary: 176 178 191;
+    --muted: 118 121 136;
+
+    --primary: 154 141 255;
+    --primary-foreground: 12 12 18;
+    --secondary: 255 154 122;
+    --secondary-foreground: 12 12 18;
+
+    --success: 122 219 163;
+    --warning: 250 184 78;
+    --error: 247 122 138;
+
+    --ring: 154 141 255;
+
+    --gradient-aurora: linear-gradient(135deg, #9A8DFF 0%, #7C6CF6 45%, #FF9A7A 100%);
+    --gradient-mesh: radial-gradient(60% 60% at 15% 10%, rgba(154,141,255,0.14) 0%, rgba(154,141,255,0) 60%),
+                      radial-gradient(50% 50% at 90% 20%, rgba(255,154,122,0.10) 0%, rgba(255,154,122,0) 60%);
+
+    --shadow-soft: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    --shadow-float: 0 16px 48px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-glow: 0 0 0 1px rgba(154,141,255,0.16), 0 12px 32px rgba(154,141,255,0.28);
+  }
+}
+
+@layer base {
+  * {
+    border-color: rgb(var(--border));
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--text));
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  ::selection {
+    background: rgba(124, 108, 246, 0.25);
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--ring));
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), ui-serif, Georgia, serif;
+  }
+  .font-mono-nova {
+    font-family: var(--font-mono), ui-monospace, monospace;
+  }
+  .glass {
+    background: rgba(var(--card), 0.72);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+  }
+  .glass-strong {
+    background: rgba(var(--card), 0.88);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+  }
+  .mesh-bg {
+    background-image: var(--gradient-mesh);
+  }
+  .aurora-text {
+    background-image: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
