@@ -17,6 +17,7 @@ import { Auth } from "@/pages/Auth";
 import Settings from "@/pages/Settings";
 import Travel from "@/pages/Travel";
 import TravelPlanner from "@/pages/TravelPlanner";
+import LandingPage from "@/pages/LandingPage";
 
 
 const Router = () => {
@@ -26,6 +27,8 @@ const Router = () => {
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/" element={<LandingPage />} />
+
 
         
 
@@ -40,7 +43,6 @@ const Router = () => {
 
         <Route element={<ProtectedRoute />} >
 
-        <Route path="/" element={<Today />} />
                 <Route path="/today" element={<Today />} />
                 <Route path="/add-task" element={<AddTask />} />
                 <Route path="/finance" element={<Finance />} />
