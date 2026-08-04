@@ -51,9 +51,12 @@ import { RecentDocumentsCard } from "@/components/cards/RecentDocumentsCard";
 import { ReminderCard } from "@/components/cards/ReminderCard";
 import { QuickActionsCard } from "@/components/cards/QuickActionsCard";
 import { loadUser } from "@/services/auth";
+import { useAppSelector } from "@/store/hooks";
 
 export default function TodayPage() {
   const navigate = useNavigate();
+
+  const user=useAppSelector(state=>state.auth.user)
 
 
   React.useEffect(()=>{
@@ -134,7 +137,7 @@ export default function TodayPage() {
         <PageSection>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">{getGreeting()}, Alex</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2">{getGreeting()}, {user?.name}</h1>
               <p className="text-muted-foreground">{getDateString()}</p>
             </div>
             <div className="flex items-center gap-3">
