@@ -27,7 +27,6 @@ const Router = () => {
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/" element={<LandingPage />} />
 
 
         
@@ -35,6 +34,8 @@ const Router = () => {
 
         <Route element={<PublicRoute />}>
           <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={<LandingPage />} />
+
           
 
 
