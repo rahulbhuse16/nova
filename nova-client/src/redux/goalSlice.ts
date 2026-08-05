@@ -1,5 +1,14 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Goal, GoalState, GoalCategory, GoalSortBy, GoalPriority, GoalStatus } from "../types/goal.types";
+import goalApi, { GoalPlanResult } from "../services/goal";
+
+interface GoalAiState {
+  plannerLoading: boolean;
+  plan: GoalPlanResult | null;
+  error: string | null;
+}
+
+type GoalSliceState = GoalState & { ai: GoalAiState };
 
 const mockGoals: Goal[] = [
   {
@@ -184,7 +193,7 @@ const mockGoals: Goal[] = [
   },
 ];
 
-const initialState: GoalState = {
+const initialState: GoalSliceState = {
   loading: false,
   goals: mockGoals,
   selectedGoal: null,
@@ -213,7 +222,27 @@ const initialState: GoalState = {
     showArchived: false,
     showFavoritesOnly: false,
   },
+  ai: {
+    plannerLoading: false,
+    plan: null,
+    error: null,
+  },
 };
+
+export const generateGoalPlan = createAsyncThunk(
+  "goals/generateGoalPlan",
+  async (goal: Goal, { rejectWithValue }) => {
+    try {
+      return await goalApi.planGoalById(goal.id, goal);
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error).message ||
+        "Failed to generate goal plan";
+      return rejectWithValue(message);
+    }
+  }
+);
 
 const goalSlice = createSlice({
   name: "goals",
@@ -315,6 +344,39 @@ const goalSlice = createSlice({
       state.ui.search = "";
       state.ui.sortBy = "deadline";
     },
+    clearAiPlan: (state) => {
+      state.ai.plan = null;
+      state.ai.error = null;
+    },
+    applyAiMilestones: (state) => {
+      if (!state.ai.plan || !state.selectedGoal) return;
+      const goal = state.goals.find((g) => g.id === state.selectedGoal!.id);
+      if (!goal) return;
+      goal.milestones = state.ai.plan.milestones.map((m) => ({
+        id: m.id,
+        title: m.title,
+        completed: false,
+        dueDate: m.dueDate,
+        description: m.description,
+      }));
+      goal.updatedAt = new Date().toISOString().split("T")[0];
+      state.selectedGoal = { ...goal };
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(generateGoalPlan.pending, (state) => {
+        state.ai.plannerLoading = true;
+        state.ai.error = null;
+      })
+      .addCase(generateGoalPlan.fulfilled, (state, action) => {
+        state.ai.plannerLoading = false;
+        state.ai.plan = action.payload;
+      })
+      .addCase(generateGoalPlan.rejected, (state, action) => {
+        state.ai.plannerLoading = false;
+        state.ai.error = (action.payload as string) || "Failed to generate goal plan";
+      });
   },
 });
 
@@ -331,6 +393,8 @@ export const {
   toggleFavorite,
   toggleCompleted,
   resetFilters,
+  clearAiPlan,
+  applyAiMilestones,
 } = goalSlice.actions;
 
 export default goalSlice.reducer;
