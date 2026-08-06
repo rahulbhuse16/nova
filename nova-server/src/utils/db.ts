@@ -4,6 +4,8 @@ import { ENV } from '../config/env'
 
 export const connectDB=async()=>{
 
+    console.log("calling with",ENV.DB_URL)
+
     try{
 
         await mongoose.connect(ENV.DB_URL)
