@@ -16,6 +16,8 @@ const {
   JWT_SECRET,
 } = ENV;
 
+
+
 const OAUTH_STATE_COOKIE = "oauth_state";
 const SALT_ROUNDS = 10;
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
@@ -274,6 +276,7 @@ export const loginGoogle = (req: Request, res: Response): void => {
   const state = crypto.randomBytes(16).toString("hex");
   setStateCookie(res, state);
 
+
   const params = new URLSearchParams({
     client_id: GOOGLE_CLIENT_ID,
     redirect_uri: GOOGLE_REDIRECT_URI,
@@ -283,6 +286,7 @@ export const loginGoogle = (req: Request, res: Response): void => {
     prompt: "select_account",
     state,
   });
+  console.log("continue with google:",params)
 
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
 };

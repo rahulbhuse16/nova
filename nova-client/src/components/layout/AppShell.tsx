@@ -265,14 +265,14 @@ const groups: SidebarNavGroup[] = [
         onDrawerClose={mobileDrawer.onClose}
       />
 
-      {onQuickAdd && (
+      {/* {onQuickAdd && (
         <FloatingActionButton
           icon={<Plus className="h-6 w-6" />}
           label="Quick add"
           onClick={onQuickAdd}
           className="bottom-24 md:bottom-8"
         />
-      )}
+      )} */}
 
       <CommandPalette items={commandItems} isOpen={palette.isOpen} onOpenChange={(o) => (o ? palette.onOpen() : palette.onClose())} />
     </div>

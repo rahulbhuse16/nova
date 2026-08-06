@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { taskRouter } from "./router/task";
 import { authRouter } from "./router/auth";
 import { travelPlannerRouter } from "./router/travel-planner";
+import { goalRouter } from "./router/goal";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/tasks", taskRouter)
 app.use("/api/v1/travel-planner", travelPlannerRouter)
+app.use("/api/v1/goals", goalRouter)
 
 
 connectDB()

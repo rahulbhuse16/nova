@@ -1,9 +1,7 @@
-"use client";
 
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PageSection } from "@/components/layout/PageSection";
 import { ContentGrid } from "@/components/layout/ContentGrid";
@@ -21,7 +19,7 @@ import { GoalProgressCard } from "@/components/goals/GoalProgressCard";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import { SecondaryButton } from "@/components/buttons/SecondaryButton";
 import { PremiumCard } from "@/components/cards/PremiumCard";
-import { Plus, Sparkles, Search, Filter as FilterIcon, X, Calendar } from "lucide-react";
+import { Plus, Sparkles, Search, Filter as FilterIcon, X, Calendar, Loader2, AlertTriangle, CheckCircle2, Target, Trophy, Flame, Award, Flag, TrendingUp } from "lucide-react";
 import {
   selectGoal,
   toggleFavorite,
@@ -31,18 +29,22 @@ import {
   setSort,
   resetFilters,
   addGoal,
+  generateGoalPlan,
+  clearAiPlan,
+  applyAiMilestones,
 } from "../redux/goalSlice";
+import type { AppDispatch } from "../store/store";
 import type { RootState } from "../store/store";
 import type { GoalCategory, GoalSortBy, GoalPriority } from "../types/goal.types";
 
 export default function GoalsPage() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { goals, categoryFilter, search, sortBy, overview, selectedGoal } = useSelector(
+  const dispatch = useDispatch<AppDispatch>();
+  const { goals, categoryFilter, search, sortBy, overview, selectedGoal, ai } = useSelector(
     (state: RootState) => state.goals
   );
   const [route, setRoute] = React.useState("goals");
   const [addGoalOpen, setAddGoalOpen] = React.useState(false);
+  const [aiPlanOpen, setAiPlanOpen] = React.useState(false);
   const [newGoal, setNewGoal] = React.useState({
     title: "",
     description: "",
@@ -162,7 +164,36 @@ export default function GoalsPage() {
   };
 
   const handleAIPlanner = () => {
-    navigate("/assistant");
+    const target = selectedGoal || sortedGoals[0];
+    if (!target) return;
+    if (!selectedGoal) dispatch(selectGoal(target.id));
+    setAiPlanOpen(true);
+    dispatch(generateGoalPlan(target));
+  };
+
+  const handleGeneratePlan = () => {
+    const target = selectedGoal || sortedGoals[0];
+    if (!target) return;
+    if (!selectedGoal) dispatch(selectGoal(target.id));
+    setAiPlanOpen(true);
+    dispatch(generateGoalPlan(target));
+  };
+
+  const handleCloseAiPlan = () => {
+    setAiPlanOpen(false);
+    dispatch(clearAiPlan());
+  };
+
+  const handleApplyMilestones = () => {
+    dispatch(applyAiMilestones());
+  };
+
+  const severityColor = (severity: string) => {
+    switch (severity) {
+      case "high": return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+      case "medium": return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+      default: return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+    }
   };
 
   // Today's Focus - Top 3 goals needing attention
@@ -179,8 +210,16 @@ export default function GoalsPage() {
       .slice(0, 3);
   }, [sortedGoals]);
 
-  // AI Insights
-  const insights = [
+  // AI Insights — use coaching insights from plan when available
+  const insights = ai.plan
+    ? ai.plan.coachingInsights.map((content, i) => ({
+        id: String(i + 1),
+        type: "suggestion" as const,
+        icon: <span className="text-lg">💡</span>,
+        content,
+        color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+      }))
+    : [
     {
       id: "1",
       type: "achievement" as const,
@@ -270,7 +309,7 @@ export default function GoalsPage() {
       label: "AI Planner",
       icon: <Sparkles className="h-5 w-5" />,
       color: "bg-purple-500/20 text-purple-400 border-purple-500/20 hover:bg-purple-500/30",
-      onClick: () => console.log("AI planner"),
+      onClick: handleAIPlanner,
     },
   ];
 
@@ -512,9 +551,9 @@ export default function GoalsPage() {
           <div className="space-y-6">
             <GoalInsights
               insights={insights}
-              onGeneratePlan={() => console.log("Generate plan")}
-              onSuggestMilestones={() => console.log("Suggest milestones")}
-              onOptimizeTimeline={() => console.log("Optimize timeline")}
+              onGeneratePlan={handleGeneratePlan}
+              onSuggestMilestones={handleGeneratePlan}
+              onOptimizeTimeline={handleGeneratePlan}
             />
 
             <GoalAchievements achievements={achievements} />
@@ -523,16 +562,153 @@ export default function GoalsPage() {
               overallScore={87}
               upcomingDeadline="Feb 15, 2026"
               currentStreak={overview.currentStreak}
-              nextMilestone="Testing & QA"
-              aiTip="Focus on completing the Testing milestone for Nova MVP. You're almost there!"
+              nextMilestone={selectedGoal?.milestones.find((m) => !m.completed)?.title || "Set a milestone"}
+              aiTip={ai.plan?.coachMessage || "Select a goal and use AI Goal Planner to get personalized coaching."}
             />
 
             <GoalQuickActions actions={quickActions} />
           </div>
         </ContentGrid>
+
+        {/* AI Goal Plan Modal */}
+        {aiPlanOpen && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <PremiumCard className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6 sticky top-0 bg-slate-900/95 backdrop-blur-sm pb-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-indigo-400" />
+                  <h2 className="text-xl font-semibold text-white">
+                    AI Goal Plan{selectedGoal ? `: ${selectedGoal.title}` : ""}
+                  </h2>
+                </div>
+                <button
+                  onClick={handleCloseAiPlan}
+                  className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {ai.plannerLoading && (
+                <div className="flex flex-col items-center justify-center py-16 gap-4">
+                  <Loader2 className="h-8 w-8 text-indigo-400 animate-spin" />
+                  <p className="text-slate-400">Nova is analyzing your goal and building your plan...</p>
+                </div>
+              )}
+
+              {ai.error && !ai.plannerLoading && (
+                <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm mb-4">
+                  {ai.error}
+                </div>
+              )}
+
+              {ai.plan && !ai.plannerLoading && (
+                <div className="space-y-6">
+                  {/* Coach Message */}
+                  <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                    <p className="text-sm font-medium text-indigo-300 mb-1">Coach Message</p>
+                    <p className="text-white">{ai.plan.coachMessage}</p>
+                  </div>
+
+                  {/* Analysis */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Analysis</h3>
+                    <p className="text-sm text-slate-300 leading-relaxed">{ai.plan.analysis}</p>
+                  </div>
+
+                  {/* Deadline Feasibility */}
+                  <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                    <div className="flex items-center gap-2 mb-2">
+                      {ai.plan.deadlineFeasibility.feasible ? (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                      ) : (
+                        <AlertTriangle className="h-4 w-4 text-amber-400" />
+                      )}
+                      <span className="text-sm font-medium text-white">
+                        Deadline {ai.plan.deadlineFeasibility.feasible ? "Feasible" : "At Risk"}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-300">{ai.plan.deadlineFeasibility.assessment}</p>
+                    {ai.plan.deadlineFeasibility.recommendedDeadline && (
+                      <p className="text-xs text-indigo-400 mt-2">
+                        Recommended: {ai.plan.deadlineFeasibility.recommendedDeadline}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Strengths & Risks */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-emerald-400 mb-2">Strengths</h3>
+                      <ul className="space-y-1">
+                        {ai.plan.strengths.map((s, i) => (
+                          <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mt-0.5 flex-shrink-0" />
+                            {s}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-rose-400 mb-2">Risks</h3>
+                      <div className="space-y-2">
+                        {ai.plan.risks.map((risk, i) => (
+                          <div key={i} className={`p-3 rounded-lg border text-sm ${severityColor(risk.severity)}`}>
+                            <p className="font-medium">{risk.title}</p>
+                            <p className="text-xs mt-1 opacity-80">{risk.mitigation}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Milestones */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-semibold text-white">Milestones</h3>
+                      <SecondaryButton onClick={handleApplyMilestones}>Apply to Goal</SecondaryButton>
+                    </div>
+                    <div className="space-y-2">
+                      {ai.plan.milestones.map((m) => (
+                        <div key={m.id} className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-white">{m.title}</p>
+                            {m.description && <p className="text-xs text-slate-400 mt-0.5">{m.description}</p>}
+                          </div>
+                          <span className="text-xs text-slate-500">{m.dueDate}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Daily Actions */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Daily Actions</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {ai.plan.dailyActions.map((day) => (
+                        <div key={day.day} className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                          <p className="text-sm font-medium text-indigo-300 mb-2">{day.day}</p>
+                          <ul className="space-y-1">
+                            {day.actions.map((action, i) => (
+                              <li key={i} className="text-xs text-slate-300">• {action}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Execution Strategy */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Execution Strategy</h3>
+                    <p className="text-sm text-slate-300 leading-relaxed">{ai.plan.executionStrategy}</p>
+                  </div>
+                </div>
+              )}
+            </PremiumCard>
+          </div>
+        )}
       </PageContainer>
     </AppShell>
   );
 }
-
-import { Target, Trophy, Flame, Award, Flag, TrendingUp, Filter } from "lucide-react";

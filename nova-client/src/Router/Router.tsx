@@ -18,6 +18,8 @@ import Settings from "@/pages/Settings";
 import Travel from "@/pages/Travel";
 import TravelPlanner from "@/pages/TravelPlanner";
 import RequestDemoPage from "@/pages/RequestDemoPage";
+import LandingPage from "@/pages/LandingPage";
+import LiveWalkthroughPage from "@/pages/LiveWalkthrough";
 
 
 const Router = () => {
@@ -27,13 +29,18 @@ const Router = () => {
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/request-demo" element={<RequestDemoPage />} />
+        <Route path="/explore" element={<RequestDemoPage />} />
+       
+
 
         
 
 
         <Route element={<PublicRoute />}>
           <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={<LandingPage />} />
+                   <Route path="/request-demo" element={<LiveWalkthroughPage />} />
+
           
 
 
@@ -42,7 +49,6 @@ const Router = () => {
 
         <Route element={<ProtectedRoute />} >
 
-        <Route path="/" element={<Today />} />
                 <Route path="/today" element={<Today />} />
                 <Route path="/add-task" element={<AddTask />} />
                 <Route path="/finance" element={<Finance />} />

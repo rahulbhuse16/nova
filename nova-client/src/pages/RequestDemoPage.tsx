@@ -151,15 +151,11 @@ function Hero() {
             improves every plan Nova makes after it.
           </Reveal>
           <Reveal delay={2} className="mt-10 flex flex-wrap items-center gap-4">
-            <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-medium text-[#05070B] transition-transform duration-300 hover:scale-[1.02]">
-              <span className="absolute inset-0 bg-gradient-to-r from-[#9BA6FF] to-[#B98CFF]" />
-              <span className="relative">Request Demo</span>
-              <ArrowRight className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-            </button>
-            <button className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-7 py-3.5 text-sm font-medium text-[#EEF0F6] transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.04]">
+           
+            <a href="/request-demo" className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] px-7 py-3.5 text-sm font-medium text-[#EEF0F6] transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.04]">
               <Play className="h-3.5 w-3.5" />
               Watch Workflow
-            </button>
+            </a>
           </Reveal>
         </div>
 
@@ -789,21 +785,17 @@ function FinalCTA() {
 
 function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16">
+     <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16">
       <div
-        className={`flex items-center gap-2.5 rounded-full ${glass} px-4 py-2`}
+        className={`flex items-center rounded-2xl ${glass} px-4 py-2 backdrop-blur-xl`}
       >
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-[#7C8CFF] to-[#B98CFF]">
-          <Coffee className="h-3 w-3 text-[#05070B]" strokeWidth={2.2} />
-        </div>
-        <span className="text-sm font-semibold text-[#EEF0F6]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          Nova
-        </span>
+        <img
+          src={'/nova_login.png'}
+          alt="Nova"
+          draggable={false}
+          className="h-30 w-auto object-contain select-none transition-transform duration-500 hover:scale-105"
+        />
       </div>
-      <button className="hidden items-center gap-2 rounded-full border border-white/[0.12] bg-[#05070B]/60 px-5 py-2.5 text-sm font-medium text-[#EEF0F6] backdrop-blur-xl transition-colors duration-300 hover:border-white/25 sm:inline-flex">
-        Request Demo
-        <ArrowRight className="h-3.5 w-3.5" />
-      </button>
     </header>
   );
 }
