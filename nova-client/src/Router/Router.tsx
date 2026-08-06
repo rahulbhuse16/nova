@@ -20,9 +20,23 @@ import TravelPlanner from "@/pages/TravelPlanner";
 import RequestDemoPage from "@/pages/RequestDemoPage";
 import LandingPage from "@/pages/LandingPage";
 import LiveWalkthroughPage from "@/pages/LiveWalkthrough";
+import { useAppSelector } from "@/store/hooks";
+import { useEffect } from "react";
+import { loadUser } from "@/services/auth";
 
 
 const Router = () => {
+
+  const authUser=useAppSelector(state=>state.auth).user
+
+
+  useEffect(()=>{
+    const userId=localStorage.getItem('userId')
+    if(userId){
+    loadUser()
+    }
+
+  },[])
   return (
     <BrowserRouter>
       <Routes>
