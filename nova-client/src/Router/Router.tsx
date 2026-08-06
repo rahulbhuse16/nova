@@ -17,6 +17,7 @@ import { Auth } from "@/pages/Auth";
 import Settings from "@/pages/Settings";
 import Travel from "@/pages/Travel";
 import TravelPlanner from "@/pages/TravelPlanner";
+import RequestDemoPage from "@/pages/RequestDemoPage";
 
 
 const Router = () => {
@@ -26,6 +27,7 @@ const Router = () => {
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/request-demo" element={<RequestDemoPage />} />
 
         
 
