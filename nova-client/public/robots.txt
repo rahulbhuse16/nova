@@ -1,0 +1,5 @@
+User-agent: *
+
+Allow: /
+
+Sitemap: https://nova-qr9h.onrender.com/sitemap.xml

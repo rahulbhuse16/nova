@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<browserconfig>
+
+<msapplication>
+
+<tile>
+
+<square150x150logo src="/nova.png"/>
+
+<TileColor>#0F172A</TileColor>
+
+</tile>
+
+</msapplication>
+
+</browserconfig>
